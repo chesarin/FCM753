@@ -2,6 +2,7 @@
 counter = 0
 headers = []
 trailers = []
+data = []
 with  open('../BadGuyThumb.dd','rb') as f:
     byte = f.read(1)
     while byte:
@@ -18,15 +19,21 @@ with  open('../BadGuyThumb.dd','rb') as f:
                     counter += 1
                     if byte3 == b'\xE0':
                         print hex(ord(byte)),hex(ord(byte1)),hex(ord(byte2)),hex(ord(byte3))
+                        data.append(byte)
+                        data.append(byte1)
+                        data.append(byte2)
+                        data.append(byte3)
                         headers.append(counter)
                         while True:
                             byte4 = f.read(1)
                             counter += 1
+                            data.append(byte4)
                             if byte4 == b'\xFF':
                                 byte5 = f.read(1)
                                 counter += 1
                                 if byte5 == b'\xD9':
                                     trailers.append(counter-2)
+                                    data.append(byte5)
                                     break
 print 'Intances of jpeg headers found',len(headers)
 print 'Intances of jpeg trailers found',len(trailers)
@@ -36,4 +43,6 @@ for header in headers:
 for trailer in trailers:
     print 'footer/trailer of match',str(trailer-3)
     print 'sector where this file is located',str(trailer/512)
-    
+with open('output/file.jpg','wb') as f:
+    for b in data:
+        f.write(b)
