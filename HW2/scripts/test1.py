@@ -30,10 +30,10 @@ with  open('../BadGuyThumb.dd','rb') as f:
                             data.append(byte4)
                             if byte4 == b'\xFF':
                                 byte5 = f.read(1)
+                                data.append(byte5)
                                 counter += 1
                                 if byte5 == b'\xD9':
                                     trailers.append(counter-2)
-                                    data.append(byte5)
                                     break
 print 'Intances of jpeg headers found',len(headers)
 print 'Intances of jpeg trailers found',len(trailers)
@@ -43,6 +43,10 @@ for header in headers:
 for trailer in trailers:
     print 'footer/trailer of match',str(trailer-3)
     print 'sector where this file is located',str(trailer/512)
+print 'length of data array',len(data)
+# print "let's fix the data in the array"
+# data.extend(['\x00']*(512%(len(data)%512)))
+# print 'length of data array after adding zeros', len(data)
 with open('output/file.jpg','wb') as f:
     for b in data:
         f.write(b)
